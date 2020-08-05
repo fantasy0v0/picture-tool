@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="picture.tool.controller.CompressionController">
+  <children>
+    <VBox prefHeight="400.0" prefWidth="600.0">
+      <HBox alignment="CENTER_RIGHT">
+        <Text>输出目录：</Text>
+        <RadioButton mnemonicParsing="false" text="原文件夹">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </RadioButton>
+        <RadioButton mnemonicParsing="false" text="自定义">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </RadioButton>
+        <TextField/>
+        <!--此处应该有一个文件夹图标的按钮-->
+        <!--<ImageView>
+          <Image url="" />
+        </ImageView>-->
+        <Button text="开始压缩" />
+        <padding>
+          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+      </HBox>
+      <HBox VBox.vgrow="ALWAYS">
+        <children>
+          <TableView HBox.hgrow="ALWAYS">
+            <columns>
+              <TableColumn prefWidth="75.0" text="文件名称"/>
+              <TableColumn prefWidth="75.0" text="大小"/>
+              <TableColumn prefWidth="75.0" text="预计大小"/>
+              <TableColumn prefWidth="75.0" text="操作"/>
+            </columns>
+          </TableView>
+          <VBox prefWidth="200">
+
+          </VBox>
+        </children>
+      </HBox>
+    </VBox>
+  </children>
+</Pane>

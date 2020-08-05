@@ -12,12 +12,18 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.beryx.jlink' version '2.19.0'
 }
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    mavenLocal()
+    maven {
+        url 'https://mirrors.huaweicloud.com/repository/maven/'
+    }
+    mavenCentral()
 }
 
 dependencies {
@@ -31,6 +37,21 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+}
+
+javafx {
+    version = "14"
+    modules = ['javafx.graphics', 'javafx.fxml', 'javafx.controls']
+}
+
+jlink {
+    launcher {
+        name = 'picture-tool'
+    }
+}
+
 application {
     // Define the main class for the application.
     mainClassName = 'picture.tool.App'
@@ -39,4 +60,8 @@ application {
 test {
     // Use junit platform for unit tests
     useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }
