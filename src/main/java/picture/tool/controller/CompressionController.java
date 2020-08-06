@@ -1,14 +1,14 @@
 package picture.tool.controller;
 
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class CompressionController implements Initializable {
@@ -29,12 +29,11 @@ public class CompressionController implements Initializable {
     tableView.setOnDragDropped(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasFiles()) {
-        List<File> files = db.getFiles();
-        System.out.println(files.toString());
+        Observable.fromIterable(db.getFiles()).observeOn(Schedulers.io()).subscribe(file -> {
+          System.out.println(Thread.currentThread());
+          System.out.println(file.toString());
+        });
       }
-    });
-    tableView.setOnMouseClicked(event -> {
-      System.out.println("tableView clicked.");
     });
   }
 }
