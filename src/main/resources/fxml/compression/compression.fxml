@@ -1,53 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
-<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="picture.tool.controller.CompressionController">
-  <children>
-    <VBox prefHeight="400.0" prefWidth="600.0">
-      <HBox alignment="CENTER_RIGHT">
-        <Text>输出目录：</Text>
-        <RadioButton mnemonicParsing="false" text="原文件夹">
-          <HBox.margin>
-            <Insets right="5.0"/>
-          </HBox.margin>
-        </RadioButton>
-        <RadioButton mnemonicParsing="false" text="自定义">
-          <HBox.margin>
-            <Insets right="5.0"/>
-          </HBox.margin>
-        </RadioButton>
-        <TextField/>
-        <!--此处应该有一个文件夹图标的按钮-->
-        <!--<ImageView>
-          <Image url="" />
-        </ImageView>-->
-        <Button text="开始压缩" />
-        <padding>
-          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-        </padding>
-      </HBox>
-      <HBox VBox.vgrow="ALWAYS">
-        <children>
-          <TableView HBox.hgrow="ALWAYS">
-            <columns>
-              <TableColumn prefWidth="75.0" text="文件名称"/>
-              <TableColumn prefWidth="75.0" text="大小"/>
-              <TableColumn prefWidth="75.0" text="预计大小"/>
-              <TableColumn prefWidth="75.0" text="操作"/>
-            </columns>
-          </TableView>
-          <VBox prefWidth="200">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-          </VBox>
-        </children>
-      </HBox>
-    </VBox>
-  </children>
+<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="picture.tool.controller.CompressionController">
+  <VBox prefHeight="400.0" prefWidth="600.0">
+    <HBox alignment="CENTER_RIGHT">
+      <Text>输出目录：</Text>
+      <RadioButton mnemonicParsing="false" selected="true" text="原文件夹">
+        <HBox.margin>
+          <Insets right="5.0"/>
+        </HBox.margin>
+        <toggleGroup>
+          <ToggleGroup fx:id="group"/>
+        </toggleGroup>
+      </RadioButton>
+      <RadioButton mnemonicParsing="false" text="自定义">
+        <HBox.margin>
+          <Insets right="5.0"/>
+        </HBox.margin>
+        <toggleGroup>
+          <fx:reference source="group"/>
+        </toggleGroup>
+      </RadioButton>
+      <TextField disable="true" editable="false">
+        <HBox.margin>
+          <Insets right="5.0"/>
+        </HBox.margin>
+      </TextField>
+      <Button>
+        <graphic>
+          <ImageView fitHeight="16.0" fitWidth="16.0">
+            <Image url="@文件夹.png"/>
+          </ImageView>
+        </graphic>
+        <HBox.margin>
+          <Insets right="5.0"/>
+        </HBox.margin>
+      </Button>
+      <Button text="开始压缩">
+        <HBox.margin>
+          <Insets right="5.0"/>
+        </HBox.margin>
+      </Button>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </padding>
+    </HBox>
+    <HBox VBox.vgrow="ALWAYS">
+      <TableView fx:id="tableView" HBox.hgrow="ALWAYS">
+        <columns>
+          <TableColumn prefWidth="75.0" text="文件名称"/>
+          <TableColumn prefWidth="75.0" text="大小"/>
+          <TableColumn prefWidth="75.0" text="预计大小"/>
+          <TableColumn prefWidth="75.0" text="操作"/>
+        </columns>
+      </TableView>
+      <VBox prefWidth="200">
+        <Text text="预览">
+          <font>
+            <Font name="System Bold Italic" size="18.0"/>
+          </font>
+        </Text>
+        <ImageView fx:id="previewImageView" fitHeight="150.0" fitWidth="200">
+          <VBox.margin>
+            <Insets bottom="5.0"/>
+          </VBox.margin>
+        </ImageView>
+        <Text text="设置">
+          <font>
+            <Font name="System Bold" size="18.0"/>
+          </font>
+        </Text>
+        <HBox prefWidth="200">
+          <Text>效果级别:</Text>
+          <Slider blockIncrement="1.0" max="10.0" min="1.0" showTickMarks="true" showTickLabels="true" majorTickUnit="5" />
+          <VBox.margin>
+            <Insets bottom="5.0" top="5.0"/>
+          </VBox.margin>
+
+        </HBox>
+        <padding>
+          <Insets left="5.0" right="5.0"/>
+        </padding>
+      </VBox>
+    </HBox>
+  </VBox>
 </Pane>

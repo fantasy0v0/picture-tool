@@ -9,7 +9,7 @@ public class App {
     }
 
     public static void main(String[] args) {
-        File input = new File("07b0231d2c4d4809852e09bb1b8ac9df.jpg");
+        /*File input = new File("07b0231d2c4d4809852e09bb1b8ac9df.jpg");
         BufferedImage image = ImageIO.read(input);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -28,6 +28,6 @@ public class App {
         os.close();
         ios.close();
         writer.dispose();
-        System.out.println("size:" + os.size() + "k.");
+        System.out.println("size:" + os.size() + "k.");*/
     }
 }

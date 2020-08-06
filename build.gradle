@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.5'
 
     // Use JUnit Jupiter API for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
@@ -54,7 +54,8 @@ jlink {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'picture.tool.App'
+    mainModule.set('fantasy0v0.picture.tool')
+    mainClassName = 'picture.tool.FxApplication'
 }
 
 test {
@@ -63,5 +64,5 @@ test {
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+    options.encoding = 'UTF-8'
 }
