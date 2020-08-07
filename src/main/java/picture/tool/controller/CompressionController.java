@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 public class CompressionController implements Initializable {
 
   @FXML
-  private TableView tableView;
+  private TableView<CompressionTask> tableView;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -30,11 +30,11 @@ public class CompressionController implements Initializable {
     tableView.setOnDragDropped(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasFiles()) {
-        Observable.fromIterable(db.getFiles()).flatMap(file -> {
+        Observable.fromIterable(db.getFiles()).subscribeOn(Schedulers.io()).flatMap(file -> {
           // 判断是否是图片文件, 如果不是则跳过
           return CompressionTask.create(file).toObservable().onErrorResumeNext(error -> Observable.empty());
-        }).toList().observeOn(Schedulers.io()).subscribe(tasks -> {
-          System.out.println("subscribe:" + tasks);
+        }).toList().subscribe(tasks -> {
+          System.out.println("subscribe:" + Thread.currentThread());
         });
       }
     });
