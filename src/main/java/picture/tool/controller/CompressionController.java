@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import picture.tool.controller.compression.CompressionTask;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,9 +30,11 @@ public class CompressionController implements Initializable {
     tableView.setOnDragDropped(event -> {
       Dragboard db = event.getDragboard();
       if (db.hasFiles()) {
-        Observable.fromIterable(db.getFiles()).observeOn(Schedulers.io()).subscribe(file -> {
-          System.out.println(Thread.currentThread());
-          System.out.println(file.toString());
+        Observable.fromIterable(db.getFiles()).flatMap(file -> {
+          // 判断是否是图片文件, 如果不是则跳过
+          return CompressionTask.create(file).toObservable().onErrorResumeNext(error -> Observable.empty());
+        }).toList().observeOn(Schedulers.io()).subscribe(tasks -> {
+          System.out.println("subscribe:" + tasks);
         });
       }
     });

@@ -11,16 +11,6 @@ enum Status {
   initial,
 
   /**
-   * 读取中
-   */
-  reading,
-
-  /**
-   * 读取完成
-   */
-  read,
-
-  /**
    * 压缩中
    */
   compressing,
@@ -28,5 +18,10 @@ enum Status {
   /**
    * 压缩完成
    */
-  compressed
+  compressed,
+
+  /**
+   * 压缩失败
+   */
+  error
 }
