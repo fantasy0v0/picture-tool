@@ -54,13 +54,17 @@ jlink {
 
 application {
     // Define the main class for the application.
-    mainModule.set('fantasy0v0.picture.tool')
+    mainModule.set('picture.tool')
     mainClassName = 'picture.tool.FxApplication'
 }
 
 test {
     // Use junit platform for unit tests
     useJUnitPlatform()
+    jvmArgs += [
+            '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED',
+            '--add-exports', 'org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED'
+    ]
 }
 
 tasks.withType(JavaCompile) {

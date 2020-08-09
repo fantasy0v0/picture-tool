@@ -3,12 +3,7 @@ package picture.tool.controller.compression;
 /**
  * 任务状态
  */
-enum Status {
-
-  /**
-   * 初始状态
-   */
-  initial,
+public enum Status {
 
   /**
    * 压缩中

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-
-<Pane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="picture.tool.controller.MainController">
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<Pane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="picture.tool.controller.MainController">
   <HBox>
     <VBox prefWidth="100.0" style="-fx-background-color: rgb(244,244,244);">
       <HBox fx:id="compressionBtn" alignment="CENTER_LEFT">
@@ -14,9 +15,9 @@
           <graphic>
             <HBox alignment="CENTER_LEFT">
               <ImageView fitHeight="20" fitWidth="20">
-                <Image url="@压缩_selected.png" />
+                <Image url="@压缩_selected.png"/>
                 <HBox.margin>
-                  <Insets right="5.0" />
+                  <Insets right="5.0"/>
                 </HBox.margin>
               </ImageView>
               <Text>压缩图片</Text>
@@ -24,12 +25,12 @@
           </graphic>
         </Button>
         <VBox.margin>
-          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
         </VBox.margin>
       </HBox>
     </VBox>
-    <Pane prefHeight="400.0" prefWidth="600.0">
-      <fx:include source="../compression/compression.fxml" />
+    <Pane prefHeight="400.0" prefWidth="700.0">
+      <fx:include source="../compression/compression.fxml"/>
     </Pane>
   </HBox>
 </Pane>

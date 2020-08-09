@@ -1,12 +1,20 @@
 package picture.tool.controller.compression;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -17,34 +25,91 @@ public class CompressionTask {
   /**
    * 源文件
    */
-  private final File originFile;
+  public final File originFile;
 
-  private final BufferedImage originImage;
+  public final BufferedImage originImage;
 
-  private final FormatName formatName;
+  public final String formatName;
 
   /**
    * 任务状态
    */
-  private ObjectProperty<Status> status = new SimpleObjectProperty<>(Status.initial);
+  public final ObjectProperty<Status> status = new SimpleObjectProperty<>(Status.compressing);
 
-  private ObjectProperty<BufferedImage> compressedImage = new SimpleObjectProperty<>(null);
+  public final ObjectProperty<BufferedImage> compressedImage = new SimpleObjectProperty<>(null);
 
-  public CompressionTask(File originFile, BufferedImage originImage, FormatName formatName) {
+  /**
+   * 压缩后大小
+   */
+  public long compressedSize = 0;
+
+  public CompressionTask(File originFile, BufferedImage originImage, String formatName) {
     this.originFile = originFile;
     this.originImage = originImage;
     this.formatName = formatName;
   }
 
-  public static Single<CompressionTask> create(File file) {
+  /**
+   * @param file               源文件
+   * @param compressionQuality a {@code float} between {@code 0} and {@code 1} indicating the desired quality level.
+   */
+  public static Single<CompressionTask> create(File file, float compressionQuality) {
     return Single.create(source -> {
       try {
         BufferedImage image = ImageIO.read(file);
-        CompressionTask task = new CompressionTask(file, Objects.requireNonNull(image), FormatName.jpeg);
+        ImageInputStream iis = ImageIO.createImageInputStream(file);
+        Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
+        String formatName;
+        if (imageReaders.hasNext()) {
+          ImageReader reader = imageReaders.next();
+          formatName = reader.getFormatName();
+        } else {
+          throw new RuntimeException("未知的图片类型");
+        }
+        CompressionTask task = new CompressionTask(file, Objects.requireNonNull(image), formatName);
+        task.adjustQuality(compressionQuality);
         source.onSuccess(task);
       } catch (Exception e) {
         source.onError(e);
       }
     });
   }
+
+  /**
+   * @param quality a {@code float} between {@code 0} and {@code 1} indicating the desired quality level.
+   */
+  public void adjustQuality(float quality) {
+    // 修改状态
+    status.setValue(Status.compressing);
+    Completable.create(emitter -> {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+      ImageWriter writer = writers.next();
+      try (ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
+        writer.setOutput(ios);
+        ImageWriteParam param = writer.getDefaultWriteParam();
+        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(1 - quality);  // Change the quality value you prefer
+        writer.write(null, new IIOImage(originImage, null, null), param);
+        File tempFile = File.createTempFile(originFile.getName(), "_compression");
+        try (FileOutputStream fos = new FileOutputStream(tempFile);
+             ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray())
+        ) {
+          fos.write(os.toByteArray());
+          compressedSize = tempFile.length();
+          compressedImage.setValue(ImageIO.read(bis));
+        } finally {
+          tempFile.delete();
+        }
+      } catch (Exception e) {
+        // 压缩失败
+        status.setValue(Status.error);
+      } finally {
+        os.close();
+        writer.dispose();
+      }
+      status.setValue(Status.compressed);
+    }).subscribeOn(Schedulers.io()).subscribe();
+  }
 }
+
