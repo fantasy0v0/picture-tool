@@ -80,7 +80,7 @@
         </Text>
         <HBox prefWidth="200">
           <Text>效果级别:</Text>
-          <Slider fx:id="slider" blockIncrement="1.0" majorTickUnit="5" max="10.0" showTickLabels="true"
+          <Slider fx:id="slider" blockIncrement="1.0" majorTickUnit="5" max="10.0" min="1.0" showTickLabels="true"
                   showTickMarks="true"/>
           <VBox.margin>
             <Insets bottom="5.0" top="5.0"/>

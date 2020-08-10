@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -83,7 +82,7 @@ public class CompressionTask {
     status.setValue(Status.compressing);
     Completable.create(emitter -> {
       ByteArrayOutputStream os = new ByteArrayOutputStream();
-      Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+      Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(formatName);
       ImageWriter writer = writers.next();
       try (ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
         writer.setOutput(ios);
@@ -92,18 +91,21 @@ public class CompressionTask {
         param.setCompressionQuality(1 - quality);  // Change the quality value you prefer
         writer.write(null, new IIOImage(originImage, null, null), param);
         File tempFile = File.createTempFile(originFile.getName(), "_compression");
-        try (FileOutputStream fos = new FileOutputStream(tempFile);
-             ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray())
-        ) {
-          fos.write(os.toByteArray());
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray())) {
+          BufferedImage compressedImage = ImageIO.read(bis);
+          if (!ImageIO.write(compressedImage, formatName, tempFile)) {
+            throw new RuntimeException("写出压缩图片临时文件失败");
+          }
+          // fos.write(os.toByteArray());
           compressedSize = tempFile.length();
-          compressedImage.setValue(ImageIO.read(bis));
+          this.compressedImage.setValue(compressedImage);
         } finally {
           tempFile.delete();
         }
       } catch (Exception e) {
         // 压缩失败
         status.setValue(Status.error);
+        e.printStackTrace();
       } finally {
         os.close();
         writer.dispose();
