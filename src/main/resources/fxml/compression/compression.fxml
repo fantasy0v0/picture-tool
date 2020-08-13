@@ -9,47 +9,52 @@
 <Pane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="picture.tool.controller.CompressionController">
   <VBox prefHeight="400.0" prefWidth="700.0">
-    <HBox alignment="CENTER_RIGHT">
-      <Text>输出目录：</Text>
-      <RadioButton mnemonicParsing="false" selected="true" text="原文件夹">
+    <HBox>
+      <HBox alignment="CENTER_LEFT">
+        <Button fx:id="clearListBtn">清除列表</Button>
         <HBox.margin>
-          <Insets right="5.0"/>
+          <Insets left="5.0"/>
         </HBox.margin>
-        <toggleGroup>
-          <ToggleGroup fx:id="group"/>
-        </toggleGroup>
-      </RadioButton>
-      <RadioButton mnemonicParsing="false" text="自定义">
-        <HBox.margin>
-          <Insets right="5.0"/>
-        </HBox.margin>
-        <toggleGroup>
-          <fx:reference source="group"/>
-        </toggleGroup>
-      </RadioButton>
-      <TextField disable="true" editable="false">
-        <HBox.margin>
-          <Insets right="5.0"/>
-        </HBox.margin>
-      </TextField>
-      <Button>
-        <graphic>
-          <ImageView fitHeight="16.0" fitWidth="16.0">
-            <Image url="@文件夹.png"/>
-          </ImageView>
-        </graphic>
-        <HBox.margin>
-          <Insets right="5.0"/>
-        </HBox.margin>
-      </Button>
-      <Button text="开始压缩">
-        <HBox.margin>
-          <Insets right="5.0"/>
-        </HBox.margin>
-      </Button>
-      <padding>
-        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-      </padding>
+      </HBox>
+      <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+        <Text>输出目录：</Text>
+        <RadioButton mnemonicParsing="false" selected="true" text="原文件夹">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+          <toggleGroup>
+            <ToggleGroup fx:id="group"/>
+          </toggleGroup>
+        </RadioButton>
+        <RadioButton mnemonicParsing="false" text="自定义" toggleGroup="$group">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </RadioButton>
+        <TextField fx:id="folderPath" disable="true" editable="false">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </TextField>
+        <Button>
+          <graphic>
+            <ImageView fitHeight="16.0" fitWidth="16.0">
+              <Image url="@文件夹.png"/>
+            </ImageView>
+          </graphic>
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </Button>
+        <Button text="开始压缩">
+          <HBox.margin>
+            <Insets right="5.0"/>
+          </HBox.margin>
+        </Button>
+        <padding>
+          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+      </HBox>
     </HBox>
     <HBox VBox.vgrow="ALWAYS">
       <TableView fx:id="tableView" HBox.hgrow="ALWAYS">

@@ -11,15 +11,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import picture.tool.controller.compression.CompressionTask;
+import picture.tool.controller.compression.Export;
 import picture.tool.controller.compression.Status;
+import picture.tool.utils.AlertHelper;
 import picture.tool.utils.FileSizeHelper;
 import picture.tool.utils.ImageUtil;
 import picture.tool.utils.RxJavaFx;
@@ -49,6 +49,20 @@ public class CompressionController implements Initializable {
 
   @FXML
   private Slider slider;
+
+  @FXML
+  private ToggleGroup group;
+
+  /**
+   * 文件夹地址
+   */
+  @FXML
+  private TextField folderPath;
+
+  @FXML
+  private Button clearListBtn;
+
+  private Export export = Export.normal;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -114,6 +128,26 @@ public class CompressionController implements Initializable {
       .subscribeOn(Schedulers.computation())
       .debounce(150, TimeUnit.MILLISECONDS)
       .subscribe(this::previewImage);
+    // 导出方式
+    RxJavaFx.fromObservableValue(group.selectedToggleProperty())
+      .filter(toggle -> toggle instanceof RadioButton)
+      .map(toggle -> (RadioButton) toggle)
+      .subscribe(radioButton -> {
+        switch (radioButton.getText()) {
+          case "原文件夹":
+            export = Export.normal;
+            break;
+          case "自定义":
+            export = Export.folder;
+            break;
+          default:
+            AlertHelper.error("未知的导出方式").showAndWait();
+            return;
+        }
+        // 如果选了自定义, 并且目录为空时, 弹出目录选择对话框
+      });
+    // 清空列表
+    clearListBtn.setOnAction(event -> this.data.clear());
   }
 
   /**
