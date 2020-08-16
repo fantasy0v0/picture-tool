@@ -2,10 +2,12 @@ package picture.tool.controller;
 
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Predicate;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +18,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.stage.DirectoryChooser;
+import picture.tool.controller.cell.ActionTableCell;
 import picture.tool.controller.compression.CompressionTask;
 import picture.tool.controller.compression.Export;
 import picture.tool.controller.compression.Status;
@@ -24,7 +28,9 @@ import picture.tool.utils.FileSizeHelper;
 import picture.tool.utils.ImageUtil;
 import picture.tool.utils.RxJavaFx;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +51,9 @@ public class CompressionController implements Initializable {
   private TableColumn<CompressionTask, String> expectedSizeColumn;
 
   @FXML
+  private TableColumn<CompressionTask, CompressionTask> actionColumn;
+
+  @FXML
   private ImageView previewImageView;
 
   @FXML
@@ -57,12 +66,19 @@ public class CompressionController implements Initializable {
    * 文件夹地址
    */
   @FXML
-  private TextField folderPath;
+  private TextField folderPathTextField;
 
   @FXML
   private Button clearListBtn;
 
   private Export export = Export.normal;
+
+  private Disposable selectedCompressionTaskDisposable;
+
+  private File folderPath;
+
+  @FXML
+  private RadioButton customFolderRadioButton;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -90,6 +106,8 @@ public class CompressionController implements Initializable {
         }
       }, p.getValue().status);
     });
+    actionColumn.setCellFactory(tableView -> new ActionTableCell(data));
+    actionColumn.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue()));
     // 图片拖拽
     tableView.setOnDragOver(event -> {
       Dragboard db = event.getDragboard();
@@ -118,7 +136,7 @@ public class CompressionController implements Initializable {
         data.forEach(task -> task.adjustQuality(value.floatValue() / 10));
         CompressionTask selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (null != selectedItem) {
-          RxJavaFx.fromObservableValue(selectedItem.status)
+          selectedCompressionTaskDisposable = RxJavaFx.fromObservableValue(selectedItem.status)
             .takeUntil((Predicate<Status>) Status.compressed::equals)
             .subscribe(status -> previewImage(selectedItem));
         }
@@ -127,27 +145,37 @@ public class CompressionController implements Initializable {
     RxJavaFx.fromObservableValue(tableView.getSelectionModel().selectedItemProperty())
       .subscribeOn(Schedulers.computation())
       .debounce(150, TimeUnit.MILLISECONDS)
-      .subscribe(this::previewImage);
+      .subscribe(selectedItem -> {
+        if (null != selectedCompressionTaskDisposable) {
+          selectedCompressionTaskDisposable.dispose();
+        }
+        this.previewImage(selectedItem);
+      });
     // 导出方式
     RxJavaFx.fromObservableValue(group.selectedToggleProperty())
       .filter(toggle -> toggle instanceof RadioButton)
       .map(toggle -> (RadioButton) toggle)
       .subscribe(radioButton -> {
-        switch (radioButton.getText()) {
-          case "原文件夹":
-            export = Export.normal;
-            break;
-          case "自定义":
-            export = Export.folder;
-            break;
-          default:
-            AlertHelper.error("未知的导出方式").showAndWait();
-            return;
-        }
+        export = switch (radioButton.getText()) {
+          case "原文件夹" -> Export.normal;
+          case "自定义" -> {
+            if (null == folderPath) {
+              showSelectedFolderPathDialog();
+            }
+            yield Export.folder;
+          }
+          default -> throw new IllegalStateException("Unexpected value: " + radioButton.getText());
+        };
         // 如果选了自定义, 并且目录为空时, 弹出目录选择对话框
       });
     // 清空列表
-    clearListBtn.setOnAction(event -> this.data.clear());
+    clearListBtn.setOnAction(event -> {
+      this.data.clear();
+      this.previewImageView.setImage(null);
+      if (null != selectedCompressionTaskDisposable) {
+        this.selectedCompressionTaskDisposable.dispose();
+      }
+    });
   }
 
   /**
@@ -164,5 +192,28 @@ public class CompressionController implements Initializable {
         emitter.onComplete();
       }
     }).subscribe(image -> Platform.runLater(() -> previewImageView.setImage(image)));
+  }
+
+  /**
+   * 选择导出目录
+   */
+  public void showSelectedFolderPathDialog() {
+    DirectoryChooser directoryChooser = new DirectoryChooser();
+    File file = directoryChooser.showDialog(null);
+    if (null == file) {
+      return;
+    }
+    folderPath = file;
+    folderPathTextField.setText(folderPath.getAbsolutePath());
+    customFolderRadioButton.setSelected(true);
+  }
+
+  public void onExportAction() {
+    Optional<CompressionTask> taskOptional = data.stream().filter(task -> Status.compressed.equals(task.status.get())).findAny();
+    if (taskOptional.isEmpty()) {
+      AlertHelper.info("请等待所有图片都压缩完毕。");
+      return;
+    }
+    // TODO 导出
   }
 }

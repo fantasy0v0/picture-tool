@@ -14,8 +14,11 @@ public class RxJavaFx {
   public static <T> Observable<T> fromObservableValue(
     final ObservableValue<T> observableValue) {
     return Observable.create(emitter -> {
-      final ChangeListener<T> listener = (ov, prev, current) -> emitter
-        .onNext(current);
+      final ChangeListener<T> listener = (ov, prev, current) -> {
+        if (null != current) {
+          emitter.onNext(current);
+        }
+      };
       observableValue.addListener(listener);
       emitter.setDisposable(new ObservableValueDispose<>(observableValue, listener));
     });

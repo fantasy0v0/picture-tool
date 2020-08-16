@@ -26,17 +26,17 @@
             <ToggleGroup fx:id="group"/>
           </toggleGroup>
         </RadioButton>
-        <RadioButton mnemonicParsing="false" text="自定义" toggleGroup="$group">
+        <RadioButton mnemonicParsing="false" text="自定义" toggleGroup="$group" fx:id="customFolderRadioButton">
           <HBox.margin>
             <Insets right="5.0"/>
           </HBox.margin>
         </RadioButton>
-        <TextField fx:id="folderPath" disable="true" editable="false">
+        <TextField fx:id="folderPathTextField" disable="true" editable="false">
           <HBox.margin>
             <Insets right="5.0"/>
           </HBox.margin>
         </TextField>
-        <Button>
+        <Button onAction="#showSelectedFolderPathDialog">
           <graphic>
             <ImageView fitHeight="16.0" fitWidth="16.0">
               <Image url="@文件夹.png"/>
@@ -46,7 +46,7 @@
             <Insets right="5.0"/>
           </HBox.margin>
         </Button>
-        <Button text="开始压缩">
+        <Button text="开始导出" onAction="#onExportAction">
           <HBox.margin>
             <Insets right="5.0"/>
           </HBox.margin>
